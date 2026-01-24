@@ -1,0 +1,15 @@
+---
+cache_apps:
+  - spotify
+  - thunderbird
+  - firefox
+  - discord
+  - shotwell
+cache_extensions:
+  - .so
+path_stubs:
+  - /usr/bin/
+  - /usr/lib/
+  - /snap/
+max_file_size: 2mb
+...
