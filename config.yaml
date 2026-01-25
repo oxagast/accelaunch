@@ -17,6 +17,7 @@ cache_apps:
   - shotwell
   - gnome
   - plex
+  - gnome
 
 ## These are the file extensions that accelaunch looks for at the
 ## end of the paths (on the filename), and matching ones are pushed
@@ -28,6 +29,7 @@ cache_extensions:
   - .xpi
   - .0
   - .1
+  - .py
 
 ## Paths where our accelaunch attempts to find files in.
 path_stubs:
@@ -35,6 +37,14 @@ path_stubs:
   - /usr/lib/
   - /usr/share/
   - /snap/
+
+## Paths to files that should always be cached.
+extra_files:
+  - /usr/bin/snap
+  - /usr/bin/gnome-terminal
+
+## The log file path if left blank, no log
+log_file: /var/log/accelaunch.log
 
 ## If your system is low on memory, you may want to decrease this to
 # mitigate large files that may never be accessed from being added
