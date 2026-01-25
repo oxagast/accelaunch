@@ -1,4 +1,12 @@
 ---
+
+## Below are some config options for accelaunch and brief descriptions
+## as to their meaning and use.
+
+## Drop the caches when the service is stopped.  Mostly for debugging.
+drop_caches_on_stop: False
+
+## The root apps that the code looks for.
 cache_apps:
   - spotify
   - thunderbird
@@ -7,6 +15,10 @@ cache_apps:
   - shotwell
   - gnome
   - plex
+
+## These are the file extensions that accelaunch looks for at the
+## end of the paths (on the filename), and matching ones are pushed
+## to disk cache (memory).
 cache_extensions:
   - .so
   - .conf
@@ -14,10 +26,16 @@ cache_extensions:
   - .xpi
   - .0
   - .1
+
+## Paths where our accelaunch attempts to find files in.
 path_stubs:
   - /usr/bin/
   - /usr/lib/
   - /usr/share/
   - /snap/
+
+## If your system is low on memory, you may want to decrease this to
+# mitigate large files that may never be accessed from being added
+# to memory.
 max_file_size: 100mb
 ...

@@ -69,27 +69,35 @@ conffile = str()
 command = str()
 ap = argparse.ArgumentParser()
 ap.add_argument("--config", "-c", help="Path to config file", default="/etc/accelaunch/config.yaml")
-ap.add_argument("command", help="Prose argument", nargs='?')
+ap.add_argument("command", help="Command argument", nargs='?')
 ap.add_argument("--verbose", "-v", help="Enable verbose output", action="store_true")
 args = ap.parse_args()
 if args.config is not None:
     conffile = args.config
+with open(conffile, 'r') as configf:
+        configd = yaml.full_load(configf)
+drop_caches = configd.get('drop_caches_on_stop', False)
 if args.command == "start":
     onestart(conffile)
     totals_summary()
     exit(0)
 if args.command == "restart":
-    os.sync()
-    with open("/proc/sys/vm/drop_caches", 'w') as drop_caches_file:
-        drop_caches_file.write('3\n')
+    if drop_caches:
+        os.sync()
+        print("Disk synced. Dropping caches...")
+        with open("/proc/sys/vm/drop_caches", 'w') as drop_caches_file:
+            drop_caches_file.write('3\n')
     onestart(conffile)
     totals_summary()
     exit(0)
 if args.command == "stop":
-    print("Syncing disk and dropping caches...")
-    os.sync()
-    with open("/proc/sys/vm/drop_caches", 'w') as drop_caches_file:
-        drop_caches_file.write('3\n')
+    if drop_caches:
+        os.sync()
+        print("Disk synced. Dropping caches...")
+        with open("/proc/sys/vm/drop_caches", 'w') as drop_caches_file:
+            drop_caches_file.write('3\n')
+    else:
+        print("Drop caches on stop is disabled in config. Not dropping caches.")
     exit(0)
 else:
     print("No valid arguments provided. Use --help for usage information.")
