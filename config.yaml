@@ -4,6 +4,8 @@
 ## as to their meaning and use.
 
 ## Drop the caches when the service is stopped.  Mostly for debugging.
+## This does nothing but decrease performance, recommended setting is
+## always False unless you know what you are doing.
 drop_caches_on_stop: False
 
 ## The root apps that the code looks for.
