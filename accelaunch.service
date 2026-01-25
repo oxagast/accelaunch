@@ -1,0 +1,15 @@
+[Unit]
+Description=Linux Accelaunch Boottime Cache Preloading Populator
+Documentation=man:acculaunch(8)
+
+[Service]
+Environment=PYTHONUNBUFFERED=1
+ExecStart=/usr/bin/python3 /usr/local/lib/accelaunch/accelaunch.py start
+ExecStop=/usr/bin/python3 /usr/local/lib/accelaunch/accelaunch.py stop
+ExecReload=/usr/bin/python3 /usr/local/lib/accelaunch/accelaunch.py restart
+Type=oneshot
+RemainAfterExit=true
+Restart=no
+
+[Install]
+WantedBy=multi-user.target

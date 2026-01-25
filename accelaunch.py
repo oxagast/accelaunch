@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import yaml
 import argparse
 import os
@@ -68,7 +69,7 @@ if os.geteuid() != 0:
 conffile = str()
 command = str()
 ap = argparse.ArgumentParser()
-ap.add_argument("--config", "-c", help="Path to config file", default="/etc/accelaunch/config.yaml")
+ap.add_argument("--config", "-c", help="Path to config file", default="/usr/local/etc/accelaunch/config.yaml")
 ap.add_argument("command", help="Command argument", nargs='?')
 ap.add_argument("--verbose", "-v", help="Enable verbose output", action="store_true")
 args = ap.parse_args()
