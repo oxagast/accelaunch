@@ -1,12 +1,11 @@
-# Accelaunch
+# AcceLaunch
+## A boottime disk cache populator for frequently used applications on Linux systems.
 
-A boottime disk cache populator for frequently used applications on Linux systems.
-
-## Overview
+### Overview
 
 Accelaunch is a Python utility designed to speed up application launch times by preloading frequently used application files into the system's disk cache at boot time. By reading application binaries, libraries, and related files into memory during system startup, subsequent launches of these applications can be significantly faster.
 
-## Features
+### Features
 
 - **YAML-based configuration** - Simple, human-readable configuration file
 - **Selective caching** - Cache specific applications and file types based on your needs
@@ -16,14 +15,14 @@ Accelaunch is a Python utility designed to speed up application launch times by 
 - **Verbose mode** - Detailed output for monitoring what's being cached
 - **Statistics reporting** - Summary of total apps, files, and data cached
 
-## Requirements
+### Requirements
 
 - Python 3.x
 - PyYAML library
 - Linux operating system (requires `/proc/sys/vm/drop_caches`)
 - Root privileges
 
-## Installation
+### Installation
 
 1. Clone the repository:
 ```bash
@@ -55,7 +54,7 @@ sudo systemctl daemon-reload
 sudo systemctl enable accelaunch
 ```
 
-## Configuration
+### Configuration
 
 Create a configuration file at `/usr/local/etc/accelaunch/config.yaml` with the following structure:
 
@@ -86,7 +85,7 @@ path_stubs:
 drop_caches_on_stop: true
 ```
 
-## Usage
+### Usage
 
 Accelaunch must be run with root privileges:
 
@@ -94,14 +93,14 @@ Accelaunch must be run with root privileges:
 systemctl start accelaunch
 ```
 
-## License
+### License
 
 This project is licensed under the GNU General Public License v3.0 - see the [LICENSE](LICENSE) file for details.
 
-## Author
+### Author
 
 Marshall Whittaker
 
-## Contributing
+### Contributing
 
 Contributions are welcome! Please feel free to submit issues or pull requests.
