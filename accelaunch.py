@@ -74,8 +74,6 @@ def totals_summary():
     logger.info("Total applications: " + str(total_apps) + " apps")
     logger.info("Total files: " + str(total_files) + " files")
     logger.info("Total cached data: " + str(round(psutil.virtual_memory().cached / (1024**3), 2)) + "gb")
-    percent_cached = round((psutil.virtual_memory().cached / psutil.virtual_memory().total) * 100, 2)
-    logger.info("Percentage of total system memory cached: " + str(percent_cached) + "%")
 
 pst = datetime.now()
 logger = logging.getLogger('accelaunch')
@@ -120,6 +118,8 @@ if args.command == "start":
     logger.info("Starting caching process...")
     onestart(conffile)
     totals_summary()
+    percent_cached = round((psutil.virtual_memory().cached / psutil.virtual_memory().total) * 100, 2)
+    logger.info("Percentage of total system memory cached: " + str(percent_cached) + "%")
     logger.info("Total processing time: " + str(timedelta(seconds=(datetime.now() - pst).seconds)))
     exit(0)
 if args.command == "restart":
@@ -130,6 +130,8 @@ if args.command == "restart":
             drop_caches_file.write(str(drop_level) + '\n')
     onestart(conffile)
     totals_summary()
+    percent_cached = round((psutil.virtual_memory().cached / psutil.virtual_memory().total) * 100, 2)
+    logger.info("Percentage of total system memory cached: " + str(percent_cached) + "%")
     logger.info("Total processing time: " + str(timedelta(seconds=(datetime.now() - pst).seconds)))
     exit(0)
 if args.command == "stop":
