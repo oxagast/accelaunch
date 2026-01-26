@@ -15,9 +15,9 @@ cache_apps:
   - firefox
   - discord
   - shotwell
-#  - gnome
-#  - plex
-#  - gnome
+  - gnome
+  - plex
+  - gnome
 
 ## These are the file extensions that accelaunch looks for at the
 ## end of the paths (on the filename), and matching ones are pushed

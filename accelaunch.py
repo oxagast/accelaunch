@@ -90,6 +90,9 @@ ap = argparse.ArgumentParser()
 ap.add_argument("--config", "-c", help="Path to config file", default="/usr/local/etc/accelaunch/config.yaml")
 ap.add_argument("command", help="Command argument", nargs='?')
 ap.add_argument("--verbose", "-v", help="Enable verbose output", action="store_true")
+ap.add_argument("--very-verbose", "-V", help="Enable very verbose output", action="store_true")
+ap.add_argument("--version", "-i", help="Show version information", action="store_true")
+
 args = ap.parse_args()
 if args.config is not None:
     conffile = args.config
@@ -100,7 +103,7 @@ drop_level = configd.get('drop_caches_level', 1)
 if configd.get('log_file') is not None:
     logger.setLevel(logging.DEBUG)
     c_handler = logging.StreamHandler(sys.stdout)
-    c_handler.setLevel(logging.INFO) # Only show INFO and above on console
+    c_handler.setLevel(logging.INFO)
     f_handler = logging.FileHandler(configd.get('log_file'))
     f_handler.setLevel(logging.DEBUG) # Log all debug messages to the file
     c_format = logging.Formatter('%(name)s - %(levelname)s - %(message)s')
@@ -137,6 +140,8 @@ if args.command == "stop":
             drop_caches_file.write(str(drop_level) + '\n')
     else:
         logger.warning("Drop caches on stop is disabled in config. Not dropping caches.")
+    percent_cached = round((psutil.virtual_memory().cached / psutil.virtual_memory().total) * 100, 2)
+    logger.info("Percentage of total system memory cached: " + str(percent_cached) + "%")
     logger.info("Total processing time: " + str(timedelta(seconds=(datetime.now() - pst).seconds)))
     exit(0)
 else:
