@@ -1,5 +1,5 @@
 # AcceLaunch
-## A boottime disk cache populator for frequently used applications on Linux systems.
+## A boottime disk cache populator for frequently used apps.
 
 ### Overview
 
