@@ -2,20 +2,19 @@
 import yaml
 import argparse
 import os
-import contextlib
 import psutil
 import sys
 import logging
 from datetime import timedelta
 from datetime import datetime
 from pathlib import Path
-version = "1.2.1"
+version = "1.2.2"
 total_apps = 0
 total_files = 0
+seen_files = []
 
 def ts():
     return f"{datetime.timestamp(datetime.now()):.4f}"
-
 
 def size_bytes(m_size_str):
     if "mb" in str(m_size_str).lower():
@@ -30,11 +29,9 @@ def cache_file(fp, verb):
     try:
         with open(fp, 'br') as cachef:
             f = cachef.read()
+            type(f)
             if verb == True:
                 logger.debug("Cached file: " + str(fp) + " (" + str(fp.stat().st_size) + "b)")
-            with contextlib.redirect_stdout(None):
-                for line in f:
-                    print(str(line).strip())
     except Exception as e:
         if verb == True:
              logger.warning("Error cacheing file " + fp + ":" + e)
@@ -54,26 +51,48 @@ def onestart(conffile):
                     if file_path.is_file():
                         if app in file_path.parts:
                             if file_path.stat().st_size <= file_size:
-                                cache_file(file_path, verb=args.verbose)
-                                globals()['total_files'] += 1
+                                if file_path not in globals()['seen_files']:
+                                    globals()['seen_files'].append(file_path)
+                                    cache_file(file_path, verb=args.verbose)
+                                    globals()['total_files'] += 1
                 for file_path in Path(stub).glob("*"):
                     if file_path.is_file():
                         if app in file_path.parts:
                             if file_path.stat().st_size <= file_size:
                                 if "." not in file_path.name:
-                                    cache_file(file_path, verb=args.verbose)
-                                    globals()['total_files'] += 1
+                                    if file_path not in globals()['seen_files']:
+                                        globals()['seen_files'].append(file_path)
+                                        cache_file(file_path, verb=args.verbose)
+                                        globals()['total_files'] += 1
     for  extras_path in configd.get('extra_files'):
         extra = Path(extras_path)
         if extra.is_file():
-            cache_file(extra, verb=args.verbose)
-            globals()['total_files'] += 1
+            if extra not in globals()['seen_files']:
+                globals()['seen_files'].append(extra)
+                cache_file(extra, verb=args.verbose)
+                globals()['total_files'] += 1
 
 
 def totals_summary():
     logger.info("Total applications: " + str(total_apps) + " apps")
     logger.info("Total files: " + str(total_files) + " files")
     logger.info("Total cached data: " + str(round(psutil.virtual_memory().cached / (1024**3), 2)) + "gb")
+
+def help_message():
+    help_text = "AcceLaunch " + version + "\n"
+    help_text += "Usage: accelaunch.py [options] <command>\n\n"
+    help_text += "Commands:\n"
+    help_text += "  start         Start the caching process\n"
+    help_text += "  restart       Restart the caching process\n"
+    help_text += "  stop          Stop the caching process\n\n"
+    help_text += "Options:\n"
+    help_text += "  -c, --config <path>      Path to config file (default: /usr/local/etc/accelaunch/config.yaml)\n"
+    help_text += "  -v, --verbose            Enable verbose output\n"
+    help_text += "  -V, --very-verbose       Enable very verbose output\n"
+    help_text += "  -i, --version            Show version information\n"
+    help_text += "  -h, --help               Show help information\n"
+    help_text += "\n"
+    print(help_text)
 
 pst = datetime.now()
 logger = logging.getLogger('accelaunch')
@@ -114,6 +133,9 @@ logger.info("AcceLaunch started.")
 logger.debug("Configuration file: " + str(conffile))
 logger.debug("Command: " + str(args.command))
 logger.debug("Logging to file: " + str(configd.get('log_file')))
+if args.version:
+    logger.info("AcceLaunch v" + version)
+    exit(0)
 if args.command == "start":
     logger.info("Starting caching process...")
     onestart(conffile)

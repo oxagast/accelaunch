@@ -18,6 +18,8 @@ cache_apps:
   - gnome
   - plex
   - gnome
+  - vlc
+  - linux-gnu
 
 ## These are the file extensions that accelaunch looks for at the
 ## end of the paths (on the filename), and matching ones are pushed
@@ -38,7 +40,6 @@ path_stubs:
   - /usr/lib/
   - /usr/share/
   - /snap/
-  - /home/marshall-whittaker/snap/
   - /opt/
 
 ## Paths to files that should always be cached.
@@ -52,14 +53,10 @@ log_file: /var/log/accelaunch.log
 ## If your system is low on memory, you may want to decrease this to
 # mitigate large files that may never be accessed from being added
 # to memory.
-max_file_size: 100mb
+max_file_size: 20mb
 
 ## cache drop level (1 to 3)
 ## The level passed to /proc/sys/vm/drop_caches on stop or restart
 drop_caches_level: 1
-
-## weather we should drop the caches on stop or restart.
-## mostly used for debugging, recommended to leave False
-drop_caches_on_stop: True
 
 ...
