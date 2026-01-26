@@ -21,14 +21,15 @@ cache_apps:
 
 ## These are the file extensions that accelaunch looks for at the
 ## end of the paths (on the filename), and matching ones are pushed
-## to disk cache (memory).
+## to disk cache (memory).  Files without an extension are
+## automatically added.
 cache_extensions:
   - .so
-  - .conf
-  - .config
   - .xpi
   - .0
   - .1
+  - .conf
+  - .config
   - .py
 
 ## Paths where our accelaunch attempts to find files in.
@@ -37,6 +38,8 @@ path_stubs:
   - /usr/lib/
   - /usr/share/
   - /snap/
+  - /home/marshall-whittaker/snap/
+  - /opt/
 
 ## Paths to files that should always be cached.
 extra_files:

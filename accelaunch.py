@@ -45,7 +45,7 @@ def onestart(conffile):
     with open(conffile, 'r') as configf:
         configd = yaml.full_load(configf)
     file_size = size_bytes(str(configd.get('max_file_size')))
-    logger.info("Caching files up to size: " + str(configd.get('max_file_size')) + "({file_size} bytes)")
+    logger.debug("Caching files up to size: " + str(configd.get('max_file_size')) + "({file_size} bytes)")
     apps = configd.get('cache_apps')
     globals()['total_apps'] = len(apps)
     logger.info("Caching files for apps: " + ", ".join(apps))
@@ -79,11 +79,12 @@ def totals_summary():
     percent_cached = round((total_cached / psutil.virtual_memory().total) * 100, 2)
     logger.info("Percentage of total system memory cached: " + str(percent_cached) + "%")
 
-
+process_start = datetime.now()
 logger = logging.getLogger('accelaunch')
 logger.info("Starting AcceLaunch...")
 if os.geteuid() != 0:
     logger.warning("This program must be run as root. Exiting.")
+    logger.info("Total processing time: " + str(timedelta(seconds=(datetime.now() - process_start).seconds)))
     exit(1)
 conffile = str()
 command = str()
@@ -97,7 +98,6 @@ if args.config is not None:
 with open(conffile, 'r') as configf:
         configd = yaml.full_load(configf)
 drop_caches = configd.get('drop_caches_on_stop', False)
-# if verbose logging to file, redirect stdout and the log_path
 if configd.get('log_file') is not None:
     logger.setLevel(logging.DEBUG)
     c_handler = logging.StreamHandler(sys.stdout)
@@ -118,6 +118,8 @@ if args.command == "start":
     logger.info("Starting caching process...")
     onestart(conffile)
     totals_summary()
+    process_end = datetime.now()
+    logger.info("Total processing time: " + str(timedelta(seconds=(datetime.now() - process_start).seconds)))
     exit(0)
 if args.command == "restart":
     if drop_caches:
@@ -127,6 +129,8 @@ if args.command == "restart":
             drop_caches_file.write('3\n')
     onestart(conffile)
     totals_summary()
+    process_end = datetime.now()
+    logger.info("Total processing time: " + str(timedelta(seconds=(process_end - process_start).seconds)))
     exit(0)
 if args.command == "stop":
     if drop_caches:
@@ -136,7 +140,11 @@ if args.command == "stop":
             drop_caches_file.write('3\n')
     else:
         logger.warning("Drop caches on stop is disabled in config. Not dropping caches.")
+    process_end = datetime.now()
+    logger.info("Total processing time: " + str(timedelta(seconds=(process_end - process_start).seconds)))
     exit(0)
 else:
     logging.warning("No valid arguments provided. Use --help for usage information.")
+    process_end = datetime.now()
+    logger.info("Total processing time: " + str(timedelta(seconds=(process_end - process_start).seconds)))
     exit(1)
