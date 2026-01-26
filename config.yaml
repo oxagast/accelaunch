@@ -15,9 +15,9 @@ cache_apps:
   - firefox
   - discord
   - shotwell
-  - gnome
-  - plex
-  - gnome
+#  - gnome
+#  - plex
+#  - gnome
 
 ## These are the file extensions that accelaunch looks for at the
 ## end of the paths (on the filename), and matching ones are pushed
@@ -53,4 +53,13 @@ log_file: /var/log/accelaunch.log
 # mitigate large files that may never be accessed from being added
 # to memory.
 max_file_size: 100mb
+
+## cache drop level (1 to 3)
+## The level passed to /proc/sys/vm/drop_caches on stop or restart
+drop_caches_level: 1
+
+## weather we should drop the caches on stop or restart.
+## mostly used for debugging, recommended to leave False
+drop_caches_on_stop: True
+
 ...
