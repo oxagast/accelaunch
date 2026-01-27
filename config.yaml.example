@@ -39,7 +39,7 @@ path_stubs:
   - /opt/
 
 ## Paths to files that should always be cached.
-extra_files:
+cache_files:
   - /usr/bin/snap
   - /usr/bin/gnome-terminal
 

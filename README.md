@@ -94,6 +94,7 @@ log_file: /var/log/accelaunch.log
 
 # On stop or restart you can have Accelaunch drop the disk caches.  This is
 # optional and not recommended, but is here for debugging or specific use cases.
+# Don't set this to true unless you know what you are doing.
 drop_caches_on_stop: false
 
 # This should usually be set to 1, which drops pagecache only.  2 drops 

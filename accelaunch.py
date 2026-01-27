@@ -64,12 +64,12 @@ def onestart(conffile):
                                         globals()['seen_files'].append(file_path)
                                         cache_file(file_path, verb=args.verbose)
                                         globals()['total_files'] += 1
-    for  extras_path in configd.get('extra_files'):
-        extra = Path(extras_path)
-        if extra.is_file():
-            if extra not in globals()['seen_files']:
-                globals()['seen_files'].append(extra)
-                cache_file(extra, verb=args.verbose)
+    for  file_path in configd.get('cache_files'):
+        file = Path(file_path)
+        if file.is_file():
+            if file not in globals()['seen_files']:
+                globals()['seen_files'].append(file)
+                cache_file(file, verb=args.verbose)
                 globals()['total_files'] += 1
 
 def cached_summary(vmdc):
