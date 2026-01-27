@@ -109,7 +109,6 @@ ap.add_argument("command", help="Command argument", nargs='?')
 ap.add_argument("--verbose", "-v", help="Enable verbose output", action="store_true")
 ap.add_argument("--very-verbose", "-V", help="Enable very verbose output", action="store_true")
 ap.add_argument("--version", "-i", help="Show version information", action="store_true")
-
 args = ap.parse_args()
 if args.config is not None:
     conffile = args.config
