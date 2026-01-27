@@ -85,7 +85,7 @@ path_stubs:
   - /opt
 
 # Files that should always be cached, regardless of other settings.
-extra_files:
+cache_files:
   - /usr/bin/firefox
   - /usr/bin/snap
 
