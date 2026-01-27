@@ -84,14 +84,14 @@ def help_message():
     help_text += "Commands:\n"
     help_text += "  start         Start the caching process\n"
     help_text += "  restart       Restart the caching process\n"
-    help_text += "  stop          Stop the caching process\n\n"
+    help_text += "  stop          Stop the caching process\n"
+    help_text += "  help          Show this help message\n\n"
     help_text += "Options:\n"
     help_text += "  -c, --config <path>      Path to config file (default: /usr/local/etc/accelaunch/config.yaml)\n"
     help_text += "  -v, --verbose            Enable verbose output\n"
     help_text += "  -V, --very-verbose       Enable very verbose output\n"
     help_text += "  -i, --version            Show version information\n"
     help_text += "  -h, --help               Show help information\n"
-    help_text += "\n"
     print(help_text)
 
 pst = datetime.now()
@@ -136,6 +136,9 @@ logger.debug("Logging to file: " + str(configd.get('log_file')))
 if args.version:
     logger.info("AcceLaunch v" + version)
     exit(0)
+if args.command == "help" or args.command is None:
+    help_message()
+    exit(1)
 if args.command == "start":
     logger.info("Starting caching process...")
     onestart(conffile)
