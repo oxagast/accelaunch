@@ -25,6 +25,6 @@ deinstall:
     ifneq ($(shell $(UID)), 0)
 	$(RAISE) $@
     else
-	rm -f $(LIBDIR)/accelaunch/accelaunch.py 
+	rm -rf $(LIBDIR)/accelaunch
 	rm -f /etc/systemd/system/multi-user.target.wants/accelaunch.service
     endif
