@@ -43,6 +43,13 @@ cache_files:
   - /usr/bin/snap
   - /usr/bin/gnome-terminal
 
+# Files that are always skipped and not added to the cache.
+# Note: This does not mean the system will not add the files
+# to the cache on its own!
+skip_files:
+  - /snap/vlc/3777/usr/share/gdb/auto-load/usr/lib/jvm/java-8-openjdk-amd64/jre/lib/amd64/server/libjvm.so-gdb.py
+  - /snap/shotwell/20/usr/share/apport/package-hooks/shotwell.py
+
 ## The log file path if left blank, no log
 log_file: /var/log/accelaunch.log
 

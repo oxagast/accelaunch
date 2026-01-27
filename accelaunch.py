@@ -41,29 +41,25 @@ def onestart(conffile):
         configd = yaml.full_load(configf)
     file_size = size_bytes(str(configd.get('max_file_size')))
     logger.debug("Caching files up to size: " + str(configd.get('max_file_size')) + "(" + str(file_size) + " bytes)")
-    apps = configd.get('cache_apps')
+    apps = configd.get('cache_apps', [])
     globals()['total_apps'] = len(apps)
     logger.info("Caching files for apps: " + ", ".join(apps))
-    for ext in configd.get('cache_extensions'):
-        for stub in configd.get('path_stubs'):
+    for ext in configd.get('cache_extensions', []):
+        for stub in configd.get('path_stubs', []):
             for app in apps:
                 for file_path in Path(stub).rglob('*' + str(ext)):
-                    if file_path.is_file():
-                        if app in file_path.parts:
-                            if file_path.stat().st_size <= file_size:
-                                if file_path not in globals()['seen_files']:
-                                    globals()['seen_files'].append(file_path)
-                                    cache_file(file_path, verb=args.verbose)
-                                    globals()['total_files'] += 1
+                    if file_path.is_file() and app in file_path.parts and file_path.stat().st_size <= file_size:
+                        if file_path not in globals()['seen_files'] + configd.get("skip_files", []):
+                            globals()['seen_files'].append(file_path)
+                            cache_file(file_path, verb=args.verbose)
+                            globals()['total_files'] += 1
                 for file_path in Path(stub).glob("*"):
-                    if file_path.is_file():
-                        if app in file_path.parts:
-                            if file_path.stat().st_size <= file_size:
-                                if "." not in file_path.name:
-                                    if file_path not in globals()['seen_files']:
-                                        globals()['seen_files'].append(file_path)
-                                        cache_file(file_path, verb=args.verbose)
-                                        globals()['total_files'] += 1
+                    if file_path.is_file() and app in file_path.parts and file_path.stat().st_size <= file_size:
+                        if "." not in file_path.name:
+                            if file_path not in globals()['seen_files'] + configd.get("skip_files", []):
+                                globals()['seen_files'].append(file_path)
+                                cache_file(file_path, verb=args.verbose)
+                                globals()['total_files'] += 1
     for  file_path in configd.get('cache_files'):
         file = Path(file_path)
         if file.is_file():
@@ -99,7 +95,7 @@ def help_message():
     print(help_text)
 
 pst = datetime.now()
-decp = 2
+decp = 1
 logger = logging.getLogger('accelaunch')
 logger.info("Starting AcceLaunch...")
 if os.geteuid() != 0:
@@ -151,7 +147,7 @@ if args.command == "help" or args.command is None:
     help_message()
     exit(1)
 if args.command == "start":
-    logger.info("Starting caching process...")
+    logger.info("Caching in progress...")
     onestart(conffile)
     totals_summary(decp)
     cached_summary(decp)
