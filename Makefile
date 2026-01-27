@@ -14,7 +14,7 @@ install: accelaunch.py
 	mkdir -p $(LIBDIR)/accelaunch
 	cp accelaunch.py $(LIBDIR)/accelaunch/accelaunch.py
 	mkdir -p $(CONFDIR)/accelaunch
-	cp config.yaml $(CONFDIR)/accelaunch/config.yaml
+	cp config.yaml.example $(CONFDIR)/accelaunch/config.yaml.example
 	chown root $(LIBDIR)/accelaunch/accelaunch.py
 	chmod a+rx,u+rwx $(LIBDIR)/accelaunch/accelaunch.py
 	cp accelaunch.service /etc/systemd/system/multi-user.target.wants/accelaunch.service
@@ -28,3 +28,5 @@ deinstall:
 	rm -rf $(LIBDIR)/accelaunch
 	rm -f /etc/systemd/system/multi-user.target.wants/accelaunch.service
     endif
+
+uninstall: deinstall

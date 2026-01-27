@@ -72,29 +72,34 @@ def onestart(conffile):
                 cache_file(extra, verb=args.verbose)
                 globals()['total_files'] += 1
 
+def cached_summary(vmdc):
+    percent_cached = round((psutil.virtual_memory().cached / psutil.virtual_memory().total) * 100, vmdc)
+    logger.info("Percentage of total system memory cached: " + str(percent_cached) + "%")
 
-def totals_summary():
+
+def totals_summary(dp):
     logger.info("Total applications: " + str(total_apps) + " apps")
     logger.info("Total files: " + str(total_files) + " files")
-    logger.info("Total cached data: " + str(round(psutil.virtual_memory().cached / (1024**3), 2)) + "gb")
+    logger.info("Total cached data: " + str(round(psutil.virtual_memory().cached / (1024**3), dp)) + "gb")
 
 def help_message():
-    help_text = "AcceLaunch " + version + "\n"
-    help_text += "Usage: accelaunch.py [options] <command>\n\n"
-    help_text += "Commands:\n"
-    help_text += "  start         Start the caching process\n"
-    help_text += "  restart       Restart the caching process\n"
-    help_text += "  stop          Stop the caching process\n"
-    help_text += "  help          Show this help message\n\n"
-    help_text += "Options:\n"
-    help_text += "  -c, --config <path>      Path to config file (default: /usr/local/etc/accelaunch/config.yaml)\n"
-    help_text += "  -v, --verbose            Enable verbose output\n"
-    help_text += "  -V, --very-verbose       Enable very verbose output\n"
-    help_text += "  -i, --version            Show version information\n"
-    help_text += "  -h, --help               Show help information\n"
+    help_text = " AcceLaunch " + version + "\n"
+    help_text += " Usage: accelaunch.py [options] <command>\n\n"
+    help_text += " Commands:\n"
+    help_text += "   start         Start the caching process\n"
+    help_text += "   restart       Restart the caching process\n"
+    help_text += "   stop          Stop the caching process\n"
+    help_text += "   help          Show this help message\n\n"
+    help_text += " Options:\n"
+    help_text += "   -c, --config <path>      Path to config file (default: /usr/local/etc/accelaunch/config.yaml)\n"
+    help_text += "   -v, --verbose            Enable verbose output\n"
+    help_text += "   -V, --very-verbose       Enable very verbose output\n"
+    help_text += "   -i, --version            Show version information\n"
+    help_text += "   -h, --help               Show help information\n"
     print(help_text)
 
 pst = datetime.now()
+decp = 2
 logger = logging.getLogger('accelaunch')
 logger.info("Starting AcceLaunch...")
 if os.geteuid() != 0:
@@ -112,8 +117,17 @@ ap.add_argument("--version", "-i", help="Show version information", action="stor
 args = ap.parse_args()
 if args.config is not None:
     conffile = args.config
-with open(conffile, 'r') as configf:
+try:
+    with open(conffile, 'r') as configf:
         configd = yaml.full_load(configf)
+except FileNotFoundError:
+    logger.warning("Configuration file not found: " + str(conffile) + ". Exiting.")
+    logger.info("Total processing time: " + str(timedelta(seconds=(datetime.now() - pst).seconds)))
+    exit(1)
+except IOError as e:
+    logger.warning("Error reading configuration file: " + str(e) + ". Exiting.")
+    logger.info("Total processing time: " + str(timedelta(seconds=(datetime.now() - pst).seconds)))
+    exit(1)
 drop_caches = configd.get('drop_caches_on_stop', False)
 drop_level = configd.get('drop_caches_level', 1)
 if configd.get('log_file') is not None:
@@ -130,8 +144,6 @@ if configd.get('log_file') is not None:
     logger.addHandler(f_handler)
 logger.info("AcceLaunch started.")
 logger.debug("Configuration file: " + str(conffile))
-logger.debug("Command: " + str(args.command))
-logger.debug("Logging to file: " + str(configd.get('log_file')))
 if args.version:
     logger.info("AcceLaunch v" + version)
     exit(0)
@@ -141,33 +153,32 @@ if args.command == "help" or args.command is None:
 if args.command == "start":
     logger.info("Starting caching process...")
     onestart(conffile)
-    totals_summary()
-    percent_cached = round((psutil.virtual_memory().cached / psutil.virtual_memory().total) * 100, 2)
-    logger.info("Percentage of total system memory cached: " + str(percent_cached) + "%")
+    totals_summary(decp)
+    cached_summary(decp)
     logger.info("Total processing time: " + str(timedelta(seconds=(datetime.now() - pst).seconds)))
     exit(0)
 if args.command == "restart":
-    if drop_caches:
+    if drop_caches and drop_level in [1, 2, 3]:
         os.sync()
         logger.warning("Disk synced. Dropping caches.")
         with open("/proc/sys/vm/drop_caches", 'w') as drop_caches_file:
             drop_caches_file.write(str(drop_level) + '\n')
+    else:
+        logger.warning("Drop caches on restart is disabled in config. Not dropping caches.")
     onestart(conffile)
-    totals_summary()
-    percent_cached = round((psutil.virtual_memory().cached / psutil.virtual_memory().total) * 100, 2)
-    logger.info("Percentage of total system memory cached: " + str(percent_cached) + "%")
+    totals_summary(decp)
+    cached_summary(decp)
     logger.info("Total processing time: " + str(timedelta(seconds=(datetime.now() - pst).seconds)))
     exit(0)
 if args.command == "stop":
-    if drop_caches:
+    if drop_caches and drop_level in [1, 2, 3]:
         os.sync()
         logger.warning("Disk synced. Dropping caches...")
         with open("/proc/sys/vm/drop_caches", 'w') as drop_caches_file:
             drop_caches_file.write(str(drop_level) + '\n')
     else:
         logger.warning("Drop caches on stop is disabled in config. Not dropping caches.")
-    percent_cached = round((psutil.virtual_memory().cached / psutil.virtual_memory().total) * 100, 2)
-    logger.info("Percentage of total system memory cached: " + str(percent_cached) + "%")
+    cached_summary(decp)
     logger.info("Total processing time: " + str(timedelta(seconds=(datetime.now() - pst).seconds)))
     exit(0)
 else:

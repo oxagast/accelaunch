@@ -1,5 +1,6 @@
 # AcceLaunch
-## A boottime disk cache populator for frequently used apps.
+
+## A boottime disk cache populator for frequently used apps
 
 ### Overview
 
@@ -19,79 +20,91 @@ Accelaunch is a Python utility designed to speed up application launch times by 
 
 - Python 3.x
 - PyYAML library
-- Linux operating system (requires `/proc/sys/vm/drop_caches`)
+- psutil library
+- logging library
+- Linux operating system
 - Root privileges
 
 ### Installation
 
 1. Clone the repository:
+
 ```bash
 git clone https://github.com/oxagast/accelaunch.git
 cd accelaunch
 ```
 
-2. Install dependencies:
+1. Install dependencies:
+
 ```bash
-pip install pyyaml
+sudo apt install python3-psutil python3-yaml
 ```
 
-3. Create the configuration directories:
+333Run make to install:
+
 ```bash
-sudo mkdir -p /usr/local/etc/accelaunch /usr/local/lib/accelauch
+make install
 ```
 
-4. Copy the scripts to a system location:
-```bash
-sudo cp accelaunch.py /usr/local/bin/accelaunch
-sudo cp config.yaml /usr/local/etc/accelaunch/config.yaml
-sudo cp accelaunch.service /usr/lib/systemd/system/accelaunch.service
-sudo chmod +x /usr/local/bin/accelaunch
-```
+1. Initialize systemd:
 
-5. Initialize systemd:
 ```bash
 sudo systemctl daemon-reload
 sudo systemctl enable accelaunch
 ```
 
+1. Skip to the Configuration section to set up your config file.
+
+2. Lastly, reboot the computer to see Accelaunch in action!
+
 ### Configuration
 
-Create a configuration file at `/usr/local/etc/accelaunch/config.yaml` with the following structure:
+Copy the example config to `/usr/local/etc/accelaunch/config.yaml` and edit it to your specific needs:
 
 ```yaml
-# Maximum file size to cache
+# The maximum file size to cache. Files larger than this will be skipped.
 max_file_size: "10MB"
 
-# Applications to cache (directory names)
+# The applications to cache at boot time.
 cache_apps:
   - firefox
   - chrome
   - vscode
   - python3
 
-# File extensions to cache
+# Specific file extensions to cache.
 cache_extensions:
   - .so      # Shared libraries
   - .py      # Python files
   - .bin     # Binaries
 
-# Base paths to search
+# Paths to check for the files in.
 path_stubs:
   - /usr/lib
   - /usr/bin
   - /opt
 
-# Drop caches on stop/restart
-drop_caches_on_stop: true
+# Files that should always be cached, regardless of other settings.
+extra_files:
+  - /usr/bin/firefox
+  - /usr/bin/snap
+
+# The log file location.  Opetional.
+log_file: /var/log/accelaunch.log
+
+# On stop or restart you can have Accelaunch drop the disk caches.  This is
+# optional and not recommended, but is here for debugging or specific use cases.
+drop_caches_on_stop: false
+
+# This should usually be set to 1, which drops pagecache only.  2 drops 
+# dentries and inodes, and 3 drops all three.  This applies to the above setting.
+drop_caches_level: 1
 ```
 
 ### Usage
 
-Accelaunch must be run with root privileges:
-
-```bash
-systemctl start accelaunch
-```
+If you installed per the instructions above, Accelaunch will run automatically at boot. You can also manage it using systemd
+using the usual systemd start/stop/restart commands.
 
 ### License
 
