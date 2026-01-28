@@ -34,28 +34,28 @@ git clone https://github.com/oxagast/accelaunch.git
 cd accelaunch
 ```
 
-1. Install dependencies:
+2. Install dependencies:
 
 ```bash
 sudo apt install python3-psutil python3-yaml
 ```
 
-333Run make to install:
+3. Run make to install:
 
 ```bash
 make install
 ```
 
-1. Initialize systemd:
+4. Initialize systemd:
 
 ```bash
 sudo systemctl daemon-reload
 sudo systemctl enable accelaunch
 ```
 
-1. Skip to the Configuration section to set up your config file.
+5. Skip to the Configuration section to set up your config file.
 
-2. Lastly, reboot the computer to see Accelaunch in action!
+6. Lastly, reboot the computer to see Accelaunch in action!
 
 ### Configuration
 
