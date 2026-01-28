@@ -6,17 +6,11 @@
 ## Drop the caches when the service is stopped.  Mostly for debugging.
 ## This does nothing but decrease performance, recommended setting is
 ## always False unless you know what you are doing.
-drop_caches_on_stop: True
+drop_caches_on_stop: False
 
 ## The root apps that the code looks for.
-cache_apps:
-  - spotify
-  - thunderbird
-  - firefox
-  - discord
-  - shotwell
-  - vlc
-  - plex
+#cache_apps:
+#  - spotify
 
 ## These are the file extensions that accelaunch looks for at the
 ## end of the paths (on the filename), and matching ones are pushed
@@ -59,10 +53,10 @@ log_file: /var/log/accelaunch.log
 ## If your system is low on memory, you may want to decrease this to
 # mitigate large files that may never be accessed from being added
 # to memory.
-max_file_size: 20mb
+max_file_size: 85mb
 
 ## cache drop level (1 to 3)
 ## The level passed to /proc/sys/vm/drop_caches on stop or restart
-drop_caches_level: 3
+drop_caches_level: 2
 
 ...
