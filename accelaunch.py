@@ -29,20 +29,22 @@ def cache_file(fp, verb):
         with open(fp, 'br') as cachef:
             f = cachef.read()
             type(f)
-            if verb == True:
+            if verb and verb >= 2:
                 logger.debug("Cached file: " + str(fp) + " (" + str(fp.stat().st_size) + "b)")
     except Exception as e:
-        if verb == True:
+        if verb and verb >= 2:
              logger.error("Error cacheing file " + fp + ":" + e)
 
 def onestart(conffile):
     with open(conffile, 'r') as configf:
         configd = yaml.full_load(configf)
     file_size = size_bytes(str(configd.get('max_file_size')))
-    logger.debug("Caching files up to size: " + str(configd.get('max_file_size')) + " (" + str(file_size) + " bytes)")
+    if args.verbose and args.verbose >= 1:
+        logger.debug("Caching files up to size: " + str(configd.get('max_file_size')) + " (" + str(file_size) + " bytes)")
     apps = configd.get('cache_apps')
     globals()['total_apps'] = len(apps)
-    logger.info("Caching files for apps: " + ", ".join(apps))
+    if args.verbose and args.verbose >= 1:
+        logger.info("Caching files for apps: " + ", ".join(apps))
     skip = configd.get("skip_files", [])
     for ext in configd.get('cache_extensions'):
         for stub in configd.get('path_stubs'):
@@ -71,7 +73,8 @@ def cache_dropper(level):
     if level > 1:
         logger.error("Dropping dentries and inodes as per config, but there is not a good reason to do this.  If you must, use:\n                       drop_caches_level: 1")
     os.sync()
-    logger.warning("Disk synced. Dropping caches.")
+    if args.verbose and args.verbose >= 1:
+        logger.warning("Disk synced. Dropping caches.")
     with open("/proc/sys/vm/drop_caches", 'w') as drop_caches_file:
         drop_caches_file.write(str(level) + '\n')
 
@@ -83,14 +86,7 @@ def totals_summary(dp,prerunm):
     logger.info("Total applications: " + str(total_apps) + " apps")
     logger.info("Total files: " + str(total_files) + " files")
     vmcached_gb = round(psutil.virtual_memory().cached / (1024**3), dp)
-    if vmcached_gb < 1 and vmcached_gb > 0:
-        logger.info("Total cached data: " + str(vmcached_gb))
-    elif vmcached_gb > 1:
-        logger.info("Total cached data: " + str(vmcached_gb) + "gb (+" + str(round(vmcached_gb - (prerunm / 1024**3), dp)) + "gb)")
-    elif vmcached_gb < 0:
-        logger.info("Total cached data: " + str(vmcached_gb) + "gb (" + str(round(vmcached_gb - (prerunm / 1024**3), dp)) + "gb)")
-    else: 
-        logger.info("Total cached data: " + str(vmcached_gb) + "gb")
+    logger.info("Total cached data: " + str(vmcached_gb) + "gb")
 
 def process_time(start_time):
     return("Total processing time: " + str(timedelta(seconds=(datetime.now() - start_time).seconds)))
@@ -106,7 +102,6 @@ def help_message():
     help_text += " Options:\n"
     help_text += "   -c, --config <path>      Path to config file (default: /usr/local/etc/accelaunch/config.yaml)\n"
     help_text += "   -v, --verbose            Enable verbose output\n"
-    help_text += "   -V, --very-verbose       Enable very verbose output\n"
     help_text += "   -i, --version            Show version information\n"
     print(help_text)
 
@@ -125,8 +120,7 @@ command = str()
 ap = argparse.ArgumentParser()
 ap.add_argument("--config", "-c", help="Path to config file", default="/usr/local/etc/accelaunch/config.yaml")
 ap.add_argument("command", help="Command argument", nargs='?')
-ap.add_argument("--verbose", "-v", help="Enable verbose output", action="store_true")
-ap.add_argument("--very-verbose", "-V", help="Enable very verbose output", action="store_true")
+ap.add_argument("--verbose", "-v", help="Enable verbose output", action="count", default=0)
 ap.add_argument("--version", "-i", help="Show version information", action="store_true")
 args = ap.parse_args()
 if args.config is not None:
@@ -149,7 +143,7 @@ drop_level = configd.get('drop_caches_level', 1)
 if configd.get('log_file') is not None:
     logger.setLevel(logging.DEBUG)
     c_handler = logging.StreamHandler(sys.stdout)
-    if args.very_verbose:
+    if args.verbose and args.verbose >= 1:
         c_handler.setLevel(logging.DEBUG)
     else:
         c_handler.setLevel(logging.INFO)
@@ -175,7 +169,8 @@ if args.command == "help" or args.command is None:
     help_message()
     exit(1)
 if args.command == "start":
-    logger.info("Caching in progress...")
+    if args.verbose and args.verbose >= 1:
+        logger.info("Caching in progress...")
     onestart(conffile)
     totals_summary(decp,prerunmem)
     cached_summary(decp)
@@ -186,7 +181,8 @@ if args.command == "restart":
     if drop_caches and drop_level in [1, 2, 3]:
         cache_dropper(drop_level)
     else:
-        logger.debug("Drop caches on restart is disabled in config. Not dropping caches.")
+        if args.verbose and args.verbose >= 1:
+            logger.debug("Drop caches on restart is disabled in config. Not dropping caches.")
     onestart(conffile)
     totals_summary(decp,prerunmem)
     cached_summary(decp)
@@ -197,7 +193,8 @@ if args.command == "stop":
     if drop_caches and drop_level in [1, 2, 3]:
         cache_dropper(drop_level)
     else:
-        logger.debug("Drop caches on stop is disabled in config. Not dropping caches.")
+        if args.verbose and args.verbose >= 1:
+            logger.debug("Drop caches on stop is disabled in config. Not dropping caches.")
     cached_summary(decp)
     logger.info(process_time(pst))
     logging.shutdown()
