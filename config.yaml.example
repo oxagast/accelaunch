@@ -60,6 +60,6 @@ max_file_size: 20mb
 
 ## cache drop level (1 to 3)
 ## The level passed to /proc/sys/vm/drop_caches on stop or restart
-drop_caches_level: 1
+#drop_caches_level: 1
 
 ...

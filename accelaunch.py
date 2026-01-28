@@ -8,10 +8,9 @@ import logging
 from datetime import timedelta
 from datetime import datetime
 from pathlib import Path
-version = "1.2.2"
+version = "1.2.4"
 total_apps = 0
 total_files = 0
-seen_files = []
 
 def ts():
     return f"{datetime.timestamp(datetime.now()):.4f}"
@@ -41,30 +40,29 @@ def onestart(conffile):
         configd = yaml.full_load(configf)
     file_size = size_bytes(str(configd.get('max_file_size')))
     logger.debug("Caching files up to size: " + str(configd.get('max_file_size')) + "(" + str(file_size) + " bytes)")
-    apps = configd.get('cache_apps', [])
+    apps = configd.get('cache_apps')
     globals()['total_apps'] = len(apps)
     logger.info("Caching files for apps: " + ", ".join(apps))
-    for ext in configd.get('cache_extensions', []):
-        for stub in configd.get('path_stubs', []):
+    skip = configd.get("skip_files")
+    for ext in configd.get('cache_extensions'):
+        for stub in configd.get('path_stubs'):
             for app in apps:
                 for file_path in Path(stub).rglob('*' + str(ext)):
-                    if file_path.is_file() and app in file_path.parts and file_path.stat().st_size <= file_size:
-                        if file_path not in globals()['seen_files'] + configd.get("skip_files", []):
-                            globals()['seen_files'].append(file_path)
+                    if file_path.is_file() and app in file_path.parts and file_path.stat().st_size <= file_size and file_path.as_posix() not in skip:
+                        skip.append(file_path.as_posix())
+                        cache_file(file_path, verb=args.verbose)
+                        globals()['total_files'] += 1
+                for file_path in Path(stub).glob("*"):
+                    if file_path.is_file() and app in file_path.parts and file_path.stat().st_size <= file_size and file_path.as_posix() not in skip:
+                        if "." not in file_path.name:
+                            skip.append(file_path.as_posix())
                             cache_file(file_path, verb=args.verbose)
                             globals()['total_files'] += 1
-                for file_path in Path(stub).glob("*"):
-                    if file_path.is_file() and app in file_path.parts and file_path.stat().st_size <= file_size:
-                        if "." not in file_path.name:
-                            if file_path not in globals()['seen_files'] + configd.get("skip_files", []):
-                                globals()['seen_files'].append(file_path)
-                                cache_file(file_path, verb=args.verbose)
-                                globals()['total_files'] += 1
     for  file_path in configd.get('cache_files'):
         file = Path(file_path)
         if file.is_file():
-            if file not in globals()['seen_files']:
-                globals()['seen_files'].append(file)
+            if file not in skip:
+                skip.append(file.as_posix())
                 cache_file(file, verb=args.verbose)
                 globals()['total_files'] += 1
 

@@ -18,6 +18,7 @@ install: accelaunch.py
 	chown root $(LIBDIR)/accelaunch/accelaunch.py
 	chmod a+rx,u+rwx $(LIBDIR)/accelaunch/accelaunch.py
 	cp accelaunch.service /etc/systemd/system/multi-user.target.wants/accelaunch.service
+	systemctl daemon-reload
     endif
 
 # Remove the installed target
