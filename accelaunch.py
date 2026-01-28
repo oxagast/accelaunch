@@ -66,15 +66,22 @@ def onestart(conffile):
                 cache_file(file, verb=args.verbose)
                 globals()['total_files'] += 1
 
+def cache_dropper(level):
+    os.sync()
+    logger.warning("Disk synced. Dropping caches.")
+    with open("/proc/sys/vm/drop_caches", 'w') as drop_caches_file:
+        drop_caches_file.write(str(drop_level) + '\n')
+
+
 def cached_summary(vmdc):
     percent_cached = round((psutil.virtual_memory().cached / psutil.virtual_memory().total) * 100, vmdc)
     logger.info("Percentage of total system memory cached: " + str(percent_cached) + "%")
 
 
-def totals_summary(dp):
+def totals_summary(dp,prerunm):
     logger.info("Total applications: " + str(total_apps) + " apps")
     logger.info("Total files: " + str(total_files) + " files")
-    logger.info("Total cached data: " + str(round(psutil.virtual_memory().cached / (1024**3), dp)) + "gb")
+    logger.info("Total cached data: " + str(round(psutil.virtual_memory().cached / (1024**3), dp)) + "gb (" + str(round((psutil.virtual_memory().cached - prerunm) / (1024**3), dp)) + "gb)")
 
 def help_message():
     help_text = " AcceLaunch " + version + "\n"
@@ -93,6 +100,7 @@ def help_message():
     print(help_text)
 
 pst = datetime.now()
+prerunmem = psutil.virtual_memory().cached
 decp = 1
 logger = logging.getLogger('accelaunch')
 logger.info("Starting AcceLaunch...")
@@ -147,29 +155,23 @@ if args.command == "help" or args.command is None:
 if args.command == "start":
     logger.info("Caching in progress...")
     onestart(conffile)
-    totals_summary(decp)
+    totals_summary(decp,prerunmem)
     cached_summary(decp)
     logger.info("Total processing time: " + str(timedelta(seconds=(datetime.now() - pst).seconds)))
     exit(0)
 if args.command == "restart":
     if drop_caches and drop_level in [1, 2, 3]:
-        os.sync()
-        logger.warning("Disk synced. Dropping caches.")
-        with open("/proc/sys/vm/drop_caches", 'w') as drop_caches_file:
-            drop_caches_file.write(str(drop_level) + '\n')
+        cache_dropper(drop_level)
     else:
         logger.warning("Drop caches on restart is disabled in config. Not dropping caches.")
     onestart(conffile)
-    totals_summary(decp)
+    totals_summary(decp,prerunmem)
     cached_summary(decp)
     logger.info("Total processing time: " + str(timedelta(seconds=(datetime.now() - pst).seconds)))
     exit(0)
 if args.command == "stop":
     if drop_caches and drop_level in [1, 2, 3]:
-        os.sync()
-        logger.warning("Disk synced. Dropping caches...")
-        with open("/proc/sys/vm/drop_caches", 'w') as drop_caches_file:
-            drop_caches_file.write(str(drop_level) + '\n')
+        cache_dropper(drop_level)
     else:
         logger.warning("Drop caches on stop is disabled in config. Not dropping caches.")
     cached_summary(decp)

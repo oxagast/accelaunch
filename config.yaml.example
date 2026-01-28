@@ -6,7 +6,7 @@
 ## Drop the caches when the service is stopped.  Mostly for debugging.
 ## This does nothing but decrease performance, recommended setting is
 ## always False unless you know what you are doing.
-drop_caches_on_stop: False
+drop_caches_on_stop: True
 
 ## The root apps that the code looks for.
 cache_apps:
@@ -16,6 +16,7 @@ cache_apps:
   - discord
   - shotwell
   - vlc
+  - plex
 
 ## These are the file extensions that accelaunch looks for at the
 ## end of the paths (on the filename), and matching ones are pushed
@@ -34,9 +35,11 @@ cache_extensions:
 path_stubs:
   - /usr/bin/
   - /usr/lib/
+  - /usr/local/
   - /usr/share/
   - /snap/
   - /opt/
+  - /var/lib/flatpak
 
 ## Paths to files that should always be cached.
 cache_files:
@@ -60,6 +63,6 @@ max_file_size: 20mb
 
 ## cache drop level (1 to 3)
 ## The level passed to /proc/sys/vm/drop_caches on stop or restart
-#drop_caches_level: 1
+drop_caches_level: 3
 
 ...
