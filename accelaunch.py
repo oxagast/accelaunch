@@ -5,12 +5,27 @@ import os
 import psutil
 import sys
 import logging
+import signal
 from datetime import timedelta
 from datetime import datetime
 from pathlib import Path
 version = "1.3"
 total_apps = 0
 total_files = 0
+CURSOR_UP_ONE = '\x1b[1A'
+ERASE_LINE = '\x1b[2K'
+
+def sigint_handler(signum, frame):
+    print(ERASE_LINE, end="")
+    print(CURSOR_UP_ONE + "celaunch - INFO - AcceLaunch started.")
+    logger.critical("SIG(" + str(signum) + ") receieved, exiting prematurely...")
+    if args.command == "start" or args.command == "restart":
+        totals_summary(decp,prerunmem)
+    cached_summary(decp)
+    logger.info(process_time(pst))
+    logging.shutdown()
+    exit(1)
+
 
 def ts():
     return f"{datetime.timestamp(datetime.now()):.4f}"
@@ -109,6 +124,7 @@ def help_message():
     print(help_text)
 
 pst = datetime.now()
+signal.signal(signal.SIGINT, sigint_handler)
 prerunmem = psutil.virtual_memory().cached
 decp = 1
 logger = logging.getLogger('accelaunch')
@@ -210,3 +226,4 @@ else:
     logger.info(process_time(pst))
     logging.shutdown()
     exit(1)
+
