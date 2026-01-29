@@ -4,9 +4,9 @@ Documentation=man:acculaunch(8)
 
 [Service]
 Environment=PYTHONUNBUFFERED=1
-ExecStart=/usr/bin/python3 /usr/local/lib/accelaunch/accelaunch.py start
-ExecStop=/usr/bin/python3 /usr/local/lib/accelaunch/accelaunch.py stop
-ExecReload=/usr/bin/python3 /usr/local/lib/accelaunch/accelaunch.py restart
+ExecStart=/usr/bin/python3 /usr/local/lib/accelaunch/accelaunch.py start -v
+ExecStop=/usr/bin/python3 /usr/local/lib/accelaunch/accelaunch.py stop -v
+ExecReload=/usr/bin/python3 /usr/local/lib/accelaunch/accelaunch.py restart -v
 Type=oneshot
 RemainAfterExit=true
 Restart=no

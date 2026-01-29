@@ -18,7 +18,7 @@ install: accelaunch.py
 	cp config.yaml.example $(CONFDIR)/accelaunch/config.yaml.example
 	chown root $(LIBDIR)/accelaunch/accelaunch.py
 	chmod a+rx,u+rwx $(LIBDIR)/accelaunch/accelaunch.py
-	cp accelaunch.service /etc/systemd/system/multi-user.target.wants/accelaunch.service
+	cp accelaunch.service /usr/lib/systemd/system/accelaunch.service
 	mkdir -p $(MANDIR)
 	gzip accelaunch.8 -c > $(MANDIR)/accelaunch.8.gz
 	systemctl daemon-reload
