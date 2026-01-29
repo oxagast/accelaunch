@@ -22,6 +22,9 @@ install: accelaunch.py
 	mkdir -p $(MANDIR)
 	gzip accelaunch.8 -c > $(MANDIR)/accelaunch.8.gz
 	systemctl daemon-reload
+	@echo
+	@echo "Don't forget to edit /usr/local/etc/accelaunch/config.yaml!"
+	@echo "Run: systemctl enable accelaunch after editing your config before next boot!"
     endif
 
 # Remove the installed target
