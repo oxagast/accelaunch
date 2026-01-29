@@ -1,0 +1,74 @@
+.\"Modified from man(1) of FreeBSD, the NetBSD mdoc.template, and mdoc.samples.
+.\"See Also:
+.\"man mdoc.samples for a complete listing of options
+.\"man mdoc for the short list of editing options
+.\"/usr/share/misc/mdoc.template
+.Dd 1/28/2026               \" DATE
+.Dt accelaunch.py 1      \" Program name and manual section number
+.Os Linux
+.Sh NAME                 \" Section Header - required - don't modify
+.Nm AcceLaunch
+.\" The following lines are read in generating the apropos(man -k) database. Use only key
+.\" words here as the database is built based on the words here and in the .ND line.
+.Nm accelaunch.py
+.\" Use .Nm macro to designate other names for the documented program.
+.Nd A boottime disk cache populator for frequently used apps
+.Sh SYNOPSIS             \" Section Header - required - don't modify
+.Nm
+.Op Fl vi              \" [-abcd]
+.Op Fl c config.yaml         \" [-a path]
+.Ar start|stop|restart|help                 \" Underlined argument - use .Ar anywhere to underline
+.Sh DESCRIPTION          \" Section Header - required - don't modify
+.Nm is designed to be run on boot, to 
+.Ar prepopulate
+the in memory disk cache. It should be manipulated via it's 
+.Ar systemd unit.
+.Pp            \" Inserts a space
+Use flags:
+.Bl -tag -width -indent  \" Begins a tagged list
+.It start               \" Each item preceded by .It macro
+Starts building the cache (is run at boot-time).
+.It restart
+This can be used to clear and rebuild the cache from scratch.
+.It stop
+This clears the cache and stops the cache system all together.
+.El                      \" Ends the list
+.Pp
+Flags:
+.Bl -tag -width -indent  \" Differs from above in tag removed
+.It Fl v                 \"-a flag as a list item
+Verbosity.  Can be used multiple times to increase effect.
+.It Fl c
+This should be followed by the yaml configuration file.
+.It Fl i
+Version information.
+.El                      \" Ends the list
+.Pp
+.\" .Sh ENVIRONMENT      \" May not be needed
+.\" .Bl -tag -width "ENV_VAR_1" -indent \" ENV_VAR_1 is width of the string ENV_VAR_1
+.\" .It Ev ENV_VAR_1
+.\" Description of ENV_VAR_1
+.\" .It Ev ENV_VAR_2
+.\" Description of ENV_VAR_2
+.\" .El
+.Sh FILES                \" File used or created by the topic of the man page
+.Bl -tag -width -compact
+.It Pa /usr/local/etc/accelaunch/config.yaml
+This is the default location of the
+.Nm
+config file.
+.El                      \" Ends the list
+.\" .Sh DIAGNOSTICS       \" May not be needed
+.\" .Bl -diag
+.\" .It Diagnostic Tag
+.\" Diagnostic informtion here.
+.\" .It Diagnostic Tag
+.\" Diagnostic informtion here.
+.\" .El
+.Sh SEE ALSO
+.\" List links in ascending order by section, alphabetically within a section.
+.\" Please do not reference files that do not exist without filing a bug report
+.Xr python 1 ,
+.Xr fincore 1 ,
+.\" .Sh BUGS              \" Document known, unremedied bugs
+.\" .Sh HISTORY           \" Document history if command behaves in a unique manner
