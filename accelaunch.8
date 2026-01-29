@@ -22,7 +22,10 @@
 .Nm is designed to be run on boot, to 
 .Ar prepopulate
 the in memory disk cache. It should be manipulated via it's 
-.Ar systemd unit.
+.Ar systemd unit.  The proper usage is to set systemd to start
+.Nm on boot using: systemctl enable accelaunch.service.  It will
+then run at boot time to preload memory with frequently
+used applications and files to speed up system performance.
 .Pp            \" Inserts a space
 Use flags:
 .Bl -tag -width -indent  \" Begins a tagged list
@@ -32,6 +35,8 @@ Starts building the cache (is run at boot-time).
 This can be used to clear and rebuild the cache from scratch.
 .It stop
 This clears the cache and stops the cache system all together.
+.It help
+Displays help information.
 .El                      \" Ends the list
 .Pp
 Flags:
@@ -40,7 +45,7 @@ Flags:
 Verbosity.  Can be used multiple times to increase effect.
 .It Fl c
 This should be followed by the yaml configuration file.
-.It Fl i
+.It Fl V
 Version information.
 .El                      \" Ends the list
 .Pp

@@ -45,7 +45,10 @@ def onestart(conffile):
     globals()['total_apps'] = len(apps)
     if args.verbose and args.verbose >= 1:
         logger.info("Caching files for apps: " + ", ".join(apps))
-    skip = configd.get("skip_files", [])
+    if configd.get("skip_files") is None:
+        skip = []
+    else:
+        skip = configd.get("skip_files")
     for ext in configd.get('cache_extensions'):
         for stub in configd.get('path_stubs'):
             for app in apps:
@@ -102,7 +105,7 @@ def help_message():
     help_text += " Options:\n"
     help_text += "   -c, --config <path>      Path to config file (default: /usr/local/etc/accelaunch/config.yaml)\n"
     help_text += "   -v, --verbose            Enable verbose output\n"
-    help_text += "   -i, --version            Show version information\n"
+    help_text += "   -V, --version            Show version information\n"
     print(help_text)
 
 pst = datetime.now()
@@ -121,7 +124,7 @@ ap = argparse.ArgumentParser()
 ap.add_argument("--config", "-c", help="Path to config file", default="/usr/local/etc/accelaunch/config.yaml")
 ap.add_argument("command", help="Command argument", nargs='?')
 ap.add_argument("--verbose", "-v", help="Enable verbose output", action="count", default=0)
-ap.add_argument("--version", "-i", help="Show version information", action="store_true")
+ap.add_argument("--version", "-V", help="Show version information", action="store_true")
 args = ap.parse_args()
 if args.config is not None:
     conffile = args.config
@@ -147,14 +150,17 @@ if configd.get('log_file') is not None:
         c_handler.setLevel(logging.DEBUG)
     else:
         c_handler.setLevel(logging.INFO)
-    f_handler = logging.FileHandler(configd.get('log_file'))
-    f_handler.setLevel(logging.DEBUG) # Log all debug messages to the file
     c_format = logging.Formatter('%(name)s - %(levelname)s - %(message)s')
-    f_format = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
     c_handler.setFormatter(c_format)
-    f_handler.setFormatter(f_format)
     logger.addHandler(c_handler)
-    logger.addHandler(f_handler)
+    if os.access(configd.get('log_file'), os.W_OK):
+        f_handler = logging.FileHandler(configd.get('log_file'))
+        f_handler.setLevel(logging.DEBUG) # Log all debug messages to the file
+        f_format = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        f_handler.setFormatter(f_format)
+        logger.addHandler(f_handler)
+    else:
+        logger.warning("Log file is not writable: " + str(configd.get('log_file')) + ". Continuing without file logging.")
 logger.info("AcceLaunch started.")
 logger.debug("Configuration file: " + str(conffile))
 if configd.get('cache_extensions') is None or configd.get('path_stubs') is None or configd.get('cache_apps') is None:

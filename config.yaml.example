@@ -9,8 +9,14 @@
 drop_caches_on_stop: False
 
 ## The root apps that the code looks for.
-#cache_apps:
-#  - spotify
+cache_apps:
+  - spotify
+  - vlc
+  - shotwell
+  - firefox
+  - thunderbird
+  - discord
+  - plex
 
 ## These are the file extensions that accelaunch looks for at the
 ## end of the paths (on the filename), and matching ones are pushed
@@ -44,8 +50,6 @@ cache_files:
 # Note: This does not mean the system will not add the files
 # to the cache on its own!
 skip_files:
-  - /snap/vlc/3777/usr/share/gdb/auto-load/usr/lib/jvm/java-8-openjdk-amd64/jre/lib/amd64/server/libjvm.so-gdb.py
-  - /snap/shotwell/20/usr/share/apport/package-hooks/shotwell.py
 
 ## The log file path if left blank, no log
 log_file: /var/log/accelaunch.log
