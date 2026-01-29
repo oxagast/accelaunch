@@ -1,6 +1,7 @@
 # Define where to install files
 PREFIX=/usr/local
 LIBDIR=$(PREFIX)/lib
+MANDIR=$(PREFIX)/man/man8
 CONFDIR=$(PREFIX)/etc
 UID = id -u
 RAISE = sudo make
@@ -18,6 +19,8 @@ install: accelaunch.py
 	chown root $(LIBDIR)/accelaunch/accelaunch.py
 	chmod a+rx,u+rwx $(LIBDIR)/accelaunch/accelaunch.py
 	cp accelaunch.service /etc/systemd/system/multi-user.target.wants/accelaunch.service
+	mkdir -p $(MANDIR)
+	gzip accelaunch.8 -c > $(MANDIR)/accelaunch.8.gz
 	systemctl daemon-reload
     endif
 
